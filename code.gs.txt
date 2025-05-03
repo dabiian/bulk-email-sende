@@ -1,0 +1,75 @@
+function enviarCorreosMasivosConAdjuntos() {
+  const hoja = SpreadsheetApp.getActiveSpreadsheet().getSheetByName("Registro de Estudiantes")
+  const rango = hoja.getDataRange();
+
+  for (i = 2; i <= rango.getLastRow(); i++) {
+    const email = hoja.getRange(i, 1).getValue()
+    const email2 = hoja.getRange(i, 2).getValue()
+    const resultado = hoja.getRange(i, 5).getValue()
+    const confirmacion = hoja.getRange(i, 6).getValue()
+    var idArchivo = hoja.getRange(i, 4).getValue()
+    const archivo = DriveApp.getFileById(idArchivo)
+    const blob = archivo.getAs(MimeType.PDF)
+    
+    var textoHtml1=HtmlService.createHtmlOutputFromFile("Aprobo").getContent();
+    if (confirmacion == "" && resultado == "Aprobo" && archivo != "") {
+      MailApp.sendEmail(email, "Resultado examen OOPT","",{htmlBody:textoHtml1,attachments: [blob]})
+      hoja.getRange(i, 6).setValue("Enviado")
+      }
+    if (confirmacion == "" && resultado == "Aprobo" && archivo != "") {
+      MailApp.sendEmail(email2, "Resultado examen OOPT","",{htmlBody:textoHtml1,attachments: [blob]})
+      hoja.getRange(i, 6).setValue("Enviado")
+      }
+   
+   var textoHtml2=HtmlService.createHtmlOutputFromFile("No aprobo").getContent();
+   if (confirmacion == "" && resultado == "No aprobo" && archivo != "") {
+      MailApp.sendEmail(email, "Resultado examen OOPT","",{htmlBody:textoHtml2,attachments: [blob]})
+      hoja.getRange(i, 6).setValue("Enviado")
+      }
+   if (confirmacion == "" && resultado == "No aprobo" && archivo != "") {
+      MailApp.sendEmail(email2, "Resultado examen OOPT","",{htmlBody:textoHtml2,attachments: [blob]})
+      hoja.getRange(i, 6).setValue("Enviado")
+      }
+  }
+
+}
+
+function Listar_Archivos_OE_Nivel_1() {
+
+var hoja = SpreadsheetApp.getActive().getSheetByName("PDF");
+
+var cabecera = hoja.getRange("B1:H1");
+
+var Datoscabecera = cabecera.setValues([["Nombre", "ID-archivo", "tipo", "url-archivo", "Folder", "Url-folder","Tamaño"]]);
+
+var folder = DriveApp.getFolderById('1JfJmMxj3f9R0xFh-qxRANZmsvqvrI7Lp');
+
+var Mis_Archivos = folder.searchFiles('mimeType = "application/pdf" '); 
+
+var f = 1;
+
+  while (Mis_Archivos.hasNext()) {
+
+    var Archivo = Mis_Archivos.next();
+
+    var f = f + 1;
+
+    hoja.getRange('B'+f).setValue(Archivo.getName());
+
+    hoja.getRange('C'+f).setValue(Archivo.getId());
+
+    hoja.getRange('D'+f).setValue(Archivo.getMimeType());
+
+    hoja.getRange('E'+f).setValue(Archivo.getUrl());
+
+    hoja.getRange('F'+f).setValue(Archivo.getParents().next().getName());
+
+    hoja.getRange('G'+f).setValue(Archivo.getParents().next().getUrl()); 
+
+    //hoja.getRange('H'+f).setValue(Archivo.getParents().next().getSize()); 
+
+    hoja.getRange('H'+f).setValue(Archivo.getSize()); 
+
+    //SpreadsheetApp.flush();//opcional
+
+  }
